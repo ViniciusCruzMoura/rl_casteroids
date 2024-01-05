@@ -4,42 +4,65 @@
 
 void InitGame() 
 {
-    game.current_screen = LOGO;
-    game.screen_scale = 3.0;
-    game.screen_width = WIN_RES_W*game.screen_scale;
-    game.screen_height = WIN_RES_H*game.screen_scale;
+    global.current_screen = LOGO;
+    global.screen_scale = 3.0;
+    global.screen_width = WIN_RES_W*global.screen_scale;
+    global.screen_height = WIN_RES_H*global.screen_scale;
     
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(game.screen_width, game.screen_height, "raylib - CPong");
+    InitWindow(global.screen_width, global.screen_height, "raylib - CPong");
     if (!IsWindowFullscreen()) {
-        // game.screen_width = GetMonitorWidth(GetCurrentMonitor());
-        // game.screen_height = GetMonitorHeight(GetCurrentMonitor());
-        // game.screen_scale = game.screen_height/WIN_RES_H;
-        game.screen_scale = game.screen_width/WIN_RES_W;
-        SetWindowSize(game.screen_width, game.screen_height);
+        // global.screen_width = GetMonitorWidth(GetCurrentMonitor());
+        // global.screen_height = GetMonitorHeight(GetCurrentMonitor());
+        // global.screen_scale = global.screen_height/WIN_RES_H;
+        global.screen_scale = global.screen_width/WIN_RES_W;
+        SetWindowSize(global.screen_width, global.screen_height);
         // ToggleFullscreen();
     }
 
-    game.game_paused = false;  // Game paused state toggle
-    game.frames_counter = 0;  // General pourpose frames counter
+    global.game_paused = false;  // Game paused state toggle
+    global.frames_counter = 0;  // General pourpose frames counter
+
+    global.game_over = false;
+    global.victory = false;
+    global.destroyed_meteors_count = 0;
+
+    // Initialization player
+    global.player.position = (Vector2){global.screen_width/2, global.screen_height/2 - global.screen_height/2};
+    global.player.speed = (Vector2){0, 0};
+    global.player.acceleration = 0;
+    global.player.rotation = 0;
+    ship_height = (PLAYER_BASE_SIZE/2)/tanf(20*DEG2RAD);
+    global.player.collider = (Vector3){
+        global.player.position.x + sin(global.player.rotation*DEG2RAD)*(ship_height/2.5f), 
+        global.player.position.y - cos(global.player.rotation*DEG2RAD)*(ship_height/2.5f), 
+        12
+    };
+    global.player.color = LIGHTGRAY;
+
     
+
+    // Initialization shoot
+
+    // Initialization meteor
+
     SetTargetFPS(60);
 }
 
 void UpdateGame()
 {
-    switch(game.current_screen)
+    switch(global.current_screen)
     {
         case LOGO: 
         {
             // Update LOGO screen data here!
             
-            game.frames_counter++;
+            global.frames_counter++;
             
-            if (game.frames_counter > 180) 
+            if (global.frames_counter > 180) 
             {
-                game.current_screen = TITLE;    // Change to TITLE screen after 3 seconds
-                game.frames_counter = 0;
+                global.current_screen = TITLE;    // Change to TITLE screen after 3 seconds
+                global.frames_counter = 0;
             }
             
         } break;
@@ -47,18 +70,18 @@ void UpdateGame()
         {
             // Update TITLE screen data here!
             
-            game.frames_counter++;
+            global.frames_counter++;
             
-            if (IsKeyPressed(KEY_ENTER)) game.current_screen = GAMEPLAY;
+            if (IsKeyPressed(KEY_ENTER)) global.current_screen = GAMEPLAY;
 
         } break;
         case GAMEPLAY:
         { 
             // Update GAMEPLAY screen data here!
 
-            if (IsKeyPressed(KEY_SPACE)) game.game_paused = !game.game_paused;
+            if (IsKeyPressed(KEY_SPACE)) global.game_paused = !global.game_paused;
 
-            if (!game.game_paused)
+            if (!global.game_paused)
             {
                 // TODO: Gameplay logic
 
@@ -76,12 +99,12 @@ void UpdateGame()
         {
             // Update END screen data here!
             
-            game.frames_counter++;
+            global.frames_counter++;
             
             if (IsKeyPressed(KEY_ENTER))
             {
                 // Replay / Exit game logic
-                game.current_screen = TITLE;
+                global.current_screen = TITLE;
             }
             
         } break;
@@ -96,7 +119,7 @@ void DrawGame()
         // ClearBackground(RAYWHITE);
         ClearBackground(BLACK);
         
-        switch(game.current_screen) 
+        switch(global.current_screen) 
         {
             case LOGO: 
             {
@@ -111,7 +134,7 @@ void DrawGame()
                 
                 DrawText("TITLE SCREEN", 20, 20, 40, DARKGREEN);
                 
-                if ((game.frames_counter/30)%2 == 0) DrawText("PRESS [ENTER] to START", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] to START", 20)/2, GetScreenHeight()/2 + 60, 20, DARKGRAY);
+                if ((global.frames_counter/30)%2 == 0) DrawText("PRESS [ENTER] to START", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] to START", 20)/2, GetScreenHeight()/2 + 60, 20, DARKGRAY);
 
                 //desenhar nave
                 //desenhar uma lista de asteroides
@@ -128,7 +151,7 @@ void DrawGame()
                 
                 DrawText("ENDING SCREEN", 20, 20, 40, DARKBLUE);
                 
-                if ((game.frames_counter/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, GRAY);
+                if ((global.frames_counter/30)%2 == 0) DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, GetScreenHeight()/2 + 80, 20, GRAY);
                 
             } break;
             default: break;
@@ -140,14 +163,14 @@ void DrawGame()
             "Debug:\n" \
             "- GetMonitorWidth: (%d)\n" \
             "- GetMonitorHeight: (%d)\n" \
-            "- game.current_screen (%d)\n" \
-            "- game.frames_counter (%d)\n" \
-            "- game.winner (%s)\n"
+            "- global.current_screen (%d)\n" \
+            "- global.frames_counter (%d)\n" \
+            "- global.winner (%s)\n"
             , GetMonitorWidth(GetCurrentMonitor())
             , GetMonitorHeight(GetCurrentMonitor())
-            , game.current_screen
-            , game.frames_counter
-            , game.winner
+            , global.current_screen
+            , global.frames_counter
+            , global.winner
             );
         DrawRectangle(0, 0, MeasureText(buf, 10), GetScreenHeight()/2, Fade(SKYBLUE, 0.5f));        
         DrawRectangleLines(0, 0, MeasureText(buf, 10), GetScreenHeight()/2, BLUE);
