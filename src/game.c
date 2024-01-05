@@ -12,16 +12,15 @@ void InitGame()
     SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(game.screen_width, game.screen_height, "raylib - CPong");
     if (!IsWindowFullscreen()) {
-        game.screen_width = GetMonitorWidth(GetCurrentMonitor());
-        game.screen_height = GetMonitorHeight(GetCurrentMonitor());
+        // game.screen_width = GetMonitorWidth(GetCurrentMonitor());
+        // game.screen_height = GetMonitorHeight(GetCurrentMonitor());
         // game.screen_scale = game.screen_height/WIN_RES_H;
         game.screen_scale = game.screen_width/WIN_RES_W;
         SetWindowSize(game.screen_width, game.screen_height);
-        ToggleFullscreen();
+        // ToggleFullscreen();
     }
 
     game.game_paused = false;  // Game paused state toggle
-    game.element_position_y = -128;
     game.frames_counter = 0;  // General pourpose frames counter
     
     SetTargetFPS(60);
@@ -143,13 +142,11 @@ void DrawGame()
             "- GetMonitorHeight: (%d)\n" \
             "- game.current_screen (%d)\n" \
             "- game.frames_counter (%d)\n" \
-            "- game.element_position_y (%d)\n" \
             "- game.winner (%s)\n"
             , GetMonitorWidth(GetCurrentMonitor())
             , GetMonitorHeight(GetCurrentMonitor())
             , game.current_screen
             , game.frames_counter
-            , game.element_position_y
             , game.winner
             );
         DrawRectangle(0, 0, MeasureText(buf, 10), GetScreenHeight()/2, Fade(SKYBLUE, 0.5f));        

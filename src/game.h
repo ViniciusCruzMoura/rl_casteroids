@@ -8,6 +8,35 @@
 
 typedef enum GameScreen { LOGO, TITLE, GAMEPLAY, ENDING } GameScreen;
 
+// Actors
+typedef struct Shoot {
+    Vector2 position;
+    Vector2 speed;
+    float radius;
+    float rotation;
+    int lifeSpawn;
+    bool active;
+    Color color;
+} Shoot;
+
+typedef struct Player {
+    Vector2 position;
+    Vector2 speed;
+    float acceleration;
+    float rotation;
+    Vector3 collider;
+    Color color;
+    Shoot shoot[10];
+} Player;
+
+typedef struct Meteor {
+    Vector2 position;
+    Vector2 speed;
+    float radius;
+    bool active;
+    Color color;
+} Meteor;
+
 typedef struct Game {
     GameScreen current_screen;
     float screen_scale;
@@ -15,7 +44,9 @@ typedef struct Game {
     int screen_height;
     bool game_paused;
     int frames_counter;
-    int element_position_y;
+    Player player;
+    Meteor meteor[8];
+    bool game_over;
 } Game;
 
 extern Game game;
