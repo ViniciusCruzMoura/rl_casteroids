@@ -47,9 +47,12 @@ typedef struct Game {
     Player player;
     Meteor meteor[8];
     bool game_over;
+    bool victory;
+    float ship_height;
+    int destroyed_meteors_count;
 } Game;
 
-extern Game game;
+extern Game global;
 
 void InitGame();         // Initialize game
 void UpdateGame();       // Update game (one frame)
